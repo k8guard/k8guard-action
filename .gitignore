@@ -1,0 +1,4 @@
+vendor/
+k8guard-action
+.env-creds
+.idea
