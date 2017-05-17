@@ -1,8 +1,8 @@
 package main
 
 import (
-	"k8guard-action/db"
-	"k8guard-action/messaging"
+	"github.com/k8guard/k8guard-action/db"
+	"github.com/k8guard/k8guard-action/messaging"
 
 	libs "github.com/k8guard/k8guardlibs"
 )

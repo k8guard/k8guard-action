@@ -1,7 +1,7 @@
 package db
 
 import (
-	"k8guard-action/db/stmts"
+	"github.com/k8guard/k8guard-action/db/stmts"
 
 	"fmt"
 	"time"
