@@ -21,8 +21,16 @@ func Connect(hosts []string) error {
 
 	// Creating cluster for cassandra
 	cluster := gocql.NewCluster(hosts...)
-	cluster.Consistency = gocql.Quorum
-	cluster.Timeout = time.Second * 5
+	cluster.Consistency = gocql.LocalQuorum
+	cluster.Timeout = time.Second * 15
+	// Auth if username is set
+	if libs.Cfg.CassandraUsername != "" {
+		cluster.Authenticator = gocql.PasswordAuthenticator{
+			Username: libs.Cfg.CassandraUsername,
+			Password: libs.Cfg.CassandraPassword,
+		}
+		cluster.SslOpts.EnableHostVerification = false //remove this when ca chain works!
+	}
 
 	// Initializing session
 	session, err := cluster.CreateSession()
