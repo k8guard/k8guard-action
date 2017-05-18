@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/gocql/gocql"
 	libs "github.com/k8guard/k8guardlibs"
 )
@@ -17,7 +16,7 @@ var Sess *gocql.Session
 // This is wrapper for gocql
 func Connect(hosts []string) error {
 
-	log.Info("Connecting to db")
+	libs.Log.Info("Connecting to db")
 
 	// Creating cluster for cassandra
 	cluster := gocql.NewCluster(hosts...)
@@ -60,7 +59,7 @@ func Connect(hosts []string) error {
 // This we need to initialize database scheme
 func initDB() error {
 
-	log.Info("Initing DB")
+	libs.Log.Info("Initing DB")
 
 	// Creating KEYSPACE (if not exists)
 	err := Sess.Query(fmt.Sprintf(stmts.CREATE_KEYSPACE, libs.Cfg.CassandraKeyspace)).Exec()
