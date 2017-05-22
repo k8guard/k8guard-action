@@ -1,6 +1,6 @@
 BINARY=k8guard-action
 
-VERSION=`git fetch;git describe --tags`
+VERSION=`git fetch;git describe --tags > /dev/null 2>&1`
 BUILD=`date +%FT%T%z`
 
 LDFLAGS=-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD}"
@@ -23,9 +23,12 @@ build:
 mac:
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build ${LDFLAGS} -o ${BINARY}
 
-
 dev-setup:
 	go get golang.org/x/tools/cmd/goimports
+
+clean:
+	if [ -f ${BINARY} ] ; then rm ${BINARY} ; fi
+	go clean
 
 sclean: clean
 	rm glide.lock
