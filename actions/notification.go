@@ -23,9 +23,9 @@ var lastHipchatMutex = &sync.Mutex{}
 const messageTemplate = `
 
 {{if .LastWarning}}
-<img src="https://raw.githubusercontent.com/mpritter76/images/master/stop.png" style="width:20px;height:20px;">
+<img src="https://raw.githubusercontent.com/k8guard/k8guard-action/images/master/stop.png" style="width:20px;height:20px;">
 {{else}}
-<img src="https://raw.githubusercontent.com/mpritter76/images/master/warning.png" style="width:20px;height:20px;">
+<img src="https://raw.githubusercontent.com/k8guard/k8guard-action/images/master/warning.png" style="width:20px;height:20px;">
 {{end}}
 
 Violation in namespace <b>{{.Namespace}}</b> in <b>{{.Cluster}}</b>:
