@@ -1,11 +1,13 @@
-hash: 4bc2e389c80de684dc21e52ebaf50b0dd9416fabc7a9bfcb026916ee3e34943d
-updated: 2017-05-22T11:04:13.252857794-05:00
+hash: c53bbc449fdb79bb745b80d03e9fb7e01f2ee7c5e1688e905c51f4e23e57df80
+updated: 2017-05-25T16:32:49.238955648-05:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
   subpackages:
   - compute/metadata
   - internal
+- name: github.com/agtorre/gocolorize
+  version: 99fea4bc9517f07eea8194702cb7076f4845b7de
 - name: github.com/blang/semver
   version: 31b736133b98f26d5e078ec9eb591666edfd091f
 - name: github.com/caarlos0/env
@@ -92,14 +94,23 @@ imports:
 - name: github.com/jonboulle/clockwork
   version: 72f9bd7c4e0c2a40055ab3d0f09654f730cce982
 - name: github.com/k8guard/k8guardlibs
-  version: 0558b3eafb02f616ee743b4ecfd93451ba2d33e1
-  repo: https://github.com/k8guard/k8guardlibs.git
+  version: c19110458d2ab794a2ed79676f9b2791717e0bde
+  repo: https://github.com/medyagh/k8guardlibs.git
   vcs: git
   subpackages:
   - config
+  - db
   - k8s
   - messaging/kafka
   - violations
+- name: github.com/klauspost/compress
+  version: e80ca55b53e5e6f53deed5c7842e7b7da95e1dc7
+  subpackages:
+  - flate
+  - gzip
+  - zlib
+- name: github.com/klauspost/cpuid
+  version: 09cded8978dc9e80714c4d85b0322337b0a1e5e0
 - name: github.com/klauspost/crc32
   version: 1bab8b35b6bb565f92cbc97939610af9369f942a
 - name: github.com/mailru/easyjson
@@ -122,6 +133,16 @@ imports:
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: github.com/rcrowley/go-metrics
   version: 1f30fe9094a513ce4c700b9a54458bbb0c96996c
+- name: github.com/revel/config
+  version: 662332b741dd464a886ab0901379c02b9bc5dc30
+- name: github.com/revel/modules
+  version: 209cc8b2b7ed93a55067bc0db97707b1432e49c4
+  subpackages:
+  - db/app
+- name: github.com/revel/revel
+  version: 8b511737be1349346965fddaf7c107017c0c1b9a
+- name: github.com/robfig/pathtree
+  version: 41257a1839e945fce74afd070e02bab2ea2c776a
 - name: github.com/Shopify/sarama
   version: 0fb560e5f7fbcaee2f75e3c34174320709f69944
 - name: github.com/sirupsen/logrus
@@ -149,6 +170,7 @@ imports:
   - http2/hpack
   - idna
   - lex/httplex
+  - websocket
 - name: golang.org/x/oauth2
   version: 3c3a985cb79f52a3190fbc056984415ca6763d01
   subpackages:
@@ -187,6 +209,8 @@ imports:
   - urlfetch
 - name: gopkg.in/alexcesaro/quotedprintable.v3
   version: 2caba252f4dc53eaf6b553000885530023f54623
+- name: gopkg.in/fsnotify.v1
+  version: 629574ca2a5df945712d3079857300b5e4da0236
 - name: gopkg.in/gomail.v2
   version: 81ebce5c23dfd25c6c67194b37d3dd3f338c98b1
 - name: gopkg.in/inf.v0
