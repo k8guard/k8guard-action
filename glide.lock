@@ -1,5 +1,5 @@
-hash: 83f61cafb3fef6c132b69ba6f1bbb41ff6cb26da0c7b25a7e873f89fed2035e1
-updated: 2017-05-25T19:38:46.788908833-05:00
+hash: 11c768122bc3734c6672d3825d00e2ceffc7e1984d3d54c2141547f25684d7a7
+updated: 2017-05-26T12:48:18.409284301-05:00
 imports:
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
@@ -92,7 +92,7 @@ imports:
 - name: github.com/jonboulle/clockwork
   version: 72f9bd7c4e0c2a40055ab3d0f09654f730cce982
 - name: github.com/k8guard/k8guardlibs
-  version: 81b61988c4cbd72e405af7ab8a86300fb73a59a6
+  version: c38e3adde22007e18b8b3fda365dc5f805dba395
   repo: https://github.com/k8guard/k8guardlibs.git
   vcs: git
   subpackages:

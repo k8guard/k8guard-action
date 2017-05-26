@@ -61,7 +61,7 @@ func Connect(hosts []string) error {
 func initDB() error {
 
 	libs.Log.Info("Initing DB")
-	// creating keyspace if conifured true
+	// creating keyspace if configured true
 	if libs.Cfg.CassandraCreateKeyspace {
 		// Creating KEYSPACE (if not exists)
 		libs.Log.Info("Creating the keyspace ", libs.Cfg.CassandraKeyspace)
@@ -73,32 +73,34 @@ func initDB() error {
 		libs.Log.Info("Skipping creating the keyspace")
 	}
 
-	err = Sess.Query(fmt.Sprintf(stmts.CREATE_VACTION_TABLE, libs.Cfg.CassandraKeyspace)).Exec()
-	if err != nil {
-		return err
+	// creating tables if configured true
+	if libs.Cfg.CassandraCreateTables {
+		err = Sess.Query(fmt.Sprintf(stmts.CREATE_VACTION_TABLE, libs.Cfg.CassandraKeyspace)).Exec()
+		if err != nil {
+			return err
+		}
+		err = Sess.Query(fmt.Sprintf(stmts.CREATE_VIOLATION_LOG_TABLE, libs.Cfg.CassandraKeyspace)).Exec()
+		if err != nil {
+			return err
+		}
+		err = Sess.Query(fmt.Sprintf(stmts.CREATE_ACTION_LOG_NAMESPACE_TYPE_TABLE, libs.Cfg.CassandraKeyspace)).Exec()
+		if err != nil {
+			return err
+		}
+		err = Sess.Query(fmt.Sprintf(stmts.CREATE_ACTION_LOG_TYPE_TABLE, libs.Cfg.CassandraKeyspace)).Exec()
+		if err != nil {
+			return err
+		}
+		err = Sess.Query(fmt.Sprintf(stmts.CREATE_ACTION_LOG_VTYPE_TABLE, libs.Cfg.CassandraKeyspace)).Exec()
+		if err != nil {
+			return err
+		}
+		err = Sess.Query(fmt.Sprintf(stmts.CREATE_ACTION_LOG_ACTION_TABLE, libs.Cfg.CassandraKeyspace)).Exec()
+		if err != nil {
+			return err
+		}
+	} else {
+		libs.Log.Info("Skipping creating tables")
 	}
-
-	err = Sess.Query(fmt.Sprintf(stmts.CREATE_VIOLATION_LOG_TABLE, libs.Cfg.CassandraKeyspace)).Exec()
-	if err != nil {
-		return err
-	}
-
-	err = Sess.Query(fmt.Sprintf(stmts.CREATE_ACTION_LOG_NAMESPACE_TYPE_TABLE, libs.Cfg.CassandraKeyspace)).Exec()
-	if err != nil {
-		return err
-	}
-	err = Sess.Query(fmt.Sprintf(stmts.CREATE_ACTION_LOG_TYPE_TABLE, libs.Cfg.CassandraKeyspace)).Exec()
-	if err != nil {
-		return err
-	}
-	err = Sess.Query(fmt.Sprintf(stmts.CREATE_ACTION_LOG_VTYPE_TABLE, libs.Cfg.CassandraKeyspace)).Exec()
-	if err != nil {
-		return err
-	}
-	err = Sess.Query(fmt.Sprintf(stmts.CREATE_ACTION_LOG_ACTION_TABLE, libs.Cfg.CassandraKeyspace)).Exec()
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
