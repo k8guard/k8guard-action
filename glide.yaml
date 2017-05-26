@@ -12,11 +12,8 @@ import:
 - package: github.com/google/go-querystring/query
   version: 53e6ce116135b80d037921a7fdd5138cf32d7a8a
 
-- package: github.com/gocql/gocql
-  version: 1f874493e9e5aebe46b312593cbd9cb5d3946eda
-
 - package: github.com/k8guard/k8guardlibs
-  version: 0558b3eafb02f616ee743b4ecfd93451ba2d33e1
+  version: 81b61988c4cbd72e405af7ab8a86300fb73a59a6
   repo: https://github.com/k8guard/k8guardlibs.git
   vcs: git
 

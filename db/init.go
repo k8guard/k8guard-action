@@ -12,6 +12,7 @@ import (
 
 // Here we'll store connection
 var Sess *gocql.Session
+var err error
 
 // This is wrapper for gocql
 func Connect(hosts []string) error {
@@ -24,7 +25,7 @@ func Connect(hosts []string) error {
 	cluster.Timeout = time.Second * 15
 	// Auth if username is set
 	if libs.Cfg.CassandraUsername != "" {
-		libs.Log.Debug("Connecting with username", libs.Cfg.CassandraUsername)
+		libs.Log.Debug("Connecting with username ", libs.Cfg.CassandraUsername)
 		cluster.Authenticator = gocql.PasswordAuthenticator{
 			Username: libs.Cfg.CassandraUsername,
 			Password: libs.Cfg.CassandraPassword,
@@ -60,11 +61,16 @@ func Connect(hosts []string) error {
 func initDB() error {
 
 	libs.Log.Info("Initing DB")
-
-	// Creating KEYSPACE (if not exists)
-	err := Sess.Query(fmt.Sprintf(stmts.CREATE_KEYSPACE, libs.Cfg.CassandraKeyspace)).Exec()
-	if err != nil {
-		return err
+	// creating keyspace if conifured true
+	if libs.Cfg.CassandraCreateKeyspace {
+		// Creating KEYSPACE (if not exists)
+		libs.Log.Info("Creating the keyspace ", libs.Cfg.CassandraKeyspace)
+		err = Sess.Query(fmt.Sprintf(stmts.CREATE_KEYSPACE, libs.Cfg.CassandraKeyspace)).Exec()
+		if err != nil {
+			return err
+		}
+	} else {
+		libs.Log.Info("Skipping creating the keyspace")
 	}
 
 	err = Sess.Query(fmt.Sprintf(stmts.CREATE_VACTION_TABLE, libs.Cfg.CassandraKeyspace)).Exec()
