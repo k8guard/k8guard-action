@@ -1,9 +1,6 @@
 package db
 
 import (
-	"k8guard-action/db"
-	"reflect"
-
 	"github.com/k8guard/k8guard-action/db/stmts"
 
 	"fmt"
@@ -105,7 +102,5 @@ func initDB() error {
 	} else {
 		libs.Log.Info("Skipping creating tables")
 	}
-	vActionRow := db.SelectVActionRow(vEntity, violation, reflect.TypeOf(actionableEntity).Name())
-
 	return nil
 }
