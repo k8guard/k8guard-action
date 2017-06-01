@@ -98,7 +98,7 @@ func notifyHipChat(message string, namespace *v1.Namespace, lastWarning bool) {
 	}
 
 	c := hipchat.NewClient(libs.Cfg.HipchatToken)
-	hipchatUrl, err := url.Parse("https://tgtbullseye.hipchat.com/v2/")
+	hipchatUrl, err := url.Parse(libs.Cfg.HipchatBaseURL)
 	c.BaseURL = hipchatUrl
 
 	color := hipchat.ColorYellow
@@ -107,7 +107,7 @@ func notifyHipChat(message string, namespace *v1.Namespace, lastWarning bool) {
 		color = hipchat.ColorRed
 	}
 
-	if teamHipchatIds, ok := namespace.Annotations["team/hipchat-ids"]; ok && libs.Cfg.HipchatTagNamespaceOwner {
+	if teamHipchatIds, ok := namespace.Annotations[libs.Cfg.AnnotationFormatForChatIds]; ok && libs.Cfg.HipchatTagNamespaceOwner {
 		tags := []string{}
 		for _, hipchatId := range strings.Split(teamHipchatIds, ",") {
 			hId := strings.TrimSpace(hipchatId)
@@ -155,7 +155,7 @@ func notifyEmail(actionMessage string, namespace *v1.Namespace, lastWarning bool
 		}
 		libs.Log.Warn("Not emailing namespace owner, sending to fallback instead.")
 		teamEmails = strings.Split(libs.Cfg.SmtpFallbackSendTo, ",")
-	} else if teamEmailString, ok := namespace.Annotations["team/email-ids"]; ok {
+	} else if teamEmailString, ok := namespace.Annotations[libs.Cfg.AnnotationFormatForEmails]; ok {
 		teamEmails = strings.Split(teamEmailString, ",")
 	} else {
 		if len(libs.Cfg.SmtpFallbackSendTo) == 0 {
