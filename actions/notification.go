@@ -173,7 +173,7 @@ func notifyEmail(actionMessage string, namespace *v1.Namespace, lastWarning bool
 	} else {
 		m.SetHeader("Subject", "Kubernetes Violation!")
 	}
-	m.SetBody("text/html", actionMessage)
+	m.SetBody("text/html", actionMessage+"<br/>"+libs.Cfg.ViolationEmailFooter)
 	d := gomail.NewDialer(libs.Cfg.SmtpServer, libs.Cfg.SmtpPort, libs.Cfg.SmtpUsername, libs.Cfg.SmtpPassword)
 	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
