@@ -3,7 +3,7 @@ package actions
 import (
 	libs "github.com/k8guard/k8guardlibs"
 	"github.com/k8guard/k8guardlibs/k8s"
-	"k8s.io/client-go/pkg/api/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type ActionableEntity interface {
@@ -23,7 +23,7 @@ func (a ActionPod) DoAction() {
 		panic(err)
 	}
 	libs.Log.Debug("Deleting Pod ", a.Name, " in namesapce ", a.Namespace)
-	err = clientset.CoreV1().Pods(a.Namespace).Delete(a.Name, &v1.DeleteOptions{})
+	err = clientset.CoreV1().Pods(a.Namespace).Delete(a.Name, &metav1.DeleteOptions{})
 	if err != nil {
 		libs.Log.Error(err)
 	}
@@ -35,14 +35,14 @@ func (a ActionDeployment) DoAction() {
 		panic(err)
 	}
 	libs.Log.Debug("Scaling Deployment ", a.Name, " in namesapce ", a.Namespace)
-	kd, err := clientset.Deployments(a.Namespace).Get(a.Name)
+	kd, err := clientset.AppsV1beta1().Deployments(a.Namespace).Get(a.Name, metav1.GetOptions{})
 	if err != nil {
 		libs.Log.Error(err)
 		return
 	}
 	replicas := int32(0)
 	kd.Spec.Replicas = &replicas
-	_, err = clientset.Deployments(a.Namespace).Update(kd)
+	_, err = clientset.AppsV1beta1().Deployments(a.Namespace).Update(kd)
 	if err != nil {
 		libs.Log.Error(err)
 	}
@@ -54,7 +54,7 @@ func (a ActionIngress) DoAction() {
 		panic(err)
 	}
 	libs.Log.Debug("Deleting Ingress ", a.Name, " in namesapce ", a.Namespace)
-	err = clientset.Ingresses(a.Namespace).Delete(a.Name, &v1.DeleteOptions{})
+	err = clientset.Ingresses(a.Namespace).Delete(a.Name, &metav1.DeleteOptions{})
 	if err != nil {
 		libs.Log.Error(err)
 	}
@@ -66,7 +66,7 @@ func (a ActionJob) DoAction() {
 		panic(err)
 	}
 	libs.Log.Debug("Deleting Job ", a.Name, " in namesapce ", a.Namespace)
-	err = clientset.BatchV2alpha1().Jobs(a.Namespace).Delete(a.Name, &v1.DeleteOptions{})
+	err = clientset.BatchV1().Jobs(a.Namespace).Delete(a.Name, &metav1.DeleteOptions{})
 	if err != nil {
 		libs.Log.Error(err)
 	}
@@ -79,7 +79,7 @@ func (a ActionCronJob) DoAction() {
 	}
 	libs.Log.Debug("Disabling CronJob ", a.Name, " in namesapce ", a.Namespace)
 
-	kcj, err := clientset.BatchV2alpha1().CronJobs(a.Namespace).Get(a.Name)
+	kcj, err := clientset.BatchV2alpha1().CronJobs(a.Namespace).Get(a.Name, metav1.GetOptions{})
 	if err != nil {
 		libs.Log.Error(err)
 		return

@@ -14,6 +14,7 @@ import (
 	"github.com/k8guard/k8guardlibs/k8s"
 	"github.com/tbruyelle/hipchat-go/hipchat"
 	"gopkg.in/gomail.v2"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/pkg/api/v1"
 )
 
@@ -72,7 +73,7 @@ func NotifyOfViolation(actionMessage actionMessage) {
 		panic(err)
 	}
 
-	ns, err := clientset.CoreV1().Namespaces().Get(actionMessage.Namespace)
+	ns, err := clientset.CoreV1().Namespaces().Get(actionMessage.Namespace, metav1.GetOptions{})
 	if err != nil {
 		panic(err)
 	}
