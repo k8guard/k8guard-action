@@ -13,8 +13,9 @@ import:
   version: 53e6ce116135b80d037921a7fdd5138cf32d7a8a
 
 - package: github.com/k8guard/k8guardlibs
-  version: cbb24b5a074f6f10649e72e27d968ece18a10594
   repo: https://github.com/k8guard/k8guardlibs.git
+  version: 23932416d3db4a41a1558c9e934517ac4cad0d21
   vcs: git
+
 
 - package: gopkg.in/gomail.v2
