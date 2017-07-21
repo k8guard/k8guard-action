@@ -2,8 +2,9 @@ package db
 
 import (
 	"fmt"
-	"github.com/k8guard/k8guard-action/db/stmts"
 	"time"
+
+	"github.com/k8guard/k8guard-action/db/stmts"
 
 	"github.com/gocql/gocql"
 

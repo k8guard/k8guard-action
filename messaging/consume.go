@@ -11,8 +11,9 @@ import (
 	"github.com/k8guard/k8guardlibs/messaging/kafka"
 
 	"encoding/json"
-	"github.com/k8guard/k8guard-action/actions"
 	"reflect"
+
+	"github.com/k8guard/k8guard-action/actions"
 
 	"github.com/k8guard/k8guard-action/db"
 
