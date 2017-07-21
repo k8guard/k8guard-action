@@ -98,13 +98,12 @@ const (
 			WITH CLUSTERING ORDER BY (created_at desc)
 	`
 
-	INSERT_TO_VLOG    = `INSERT INTO %s.vlog_namespace_type (namespace, cluster, type, source, vType, vSource, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`
+	INSERT_TO_VLOG = `INSERT INTO %s.vlog_namespace_type (namespace, cluster, type, source, vType, vSource, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`
 
 	INSERT_TO_ALOG_NAMESPACE_TYPE = `INSERT INTO %s.alog_namespace_type (namespace, cluster, type, source, vType, vSource, action, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-	INSERT_TO_ALOG_TYPE = `INSERT INTO %s.alog_type (namespace, cluster, type, source, vType, vSource, action, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-	INSERT_TO_ALOG_VTYPE = `INSERT INTO %s.alog_vType (namespace, cluster, type, source, vType, vSource, action, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-	INSERT_TO_ALOG_ACTION = `INSERT INTO %s.alog_action (namespace, cluster, type, source, vType, vSource, action, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-
+	INSERT_TO_ALOG_TYPE           = `INSERT INTO %s.alog_type (namespace, cluster, type, source, vType, vSource, action, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+	INSERT_TO_ALOG_VTYPE          = `INSERT INTO %s.alog_vType (namespace, cluster, type, source, vType, vSource, action, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+	INSERT_TO_ALOG_ACTION         = `INSERT INTO %s.alog_action (namespace, cluster, type, source, vType, vSource, action, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 
 	INSERT_TO_VACTION = `INSERT INTO %s.vaction (namespace, cluster, type, source, vType, vSource, actions, created_at ,expire_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
