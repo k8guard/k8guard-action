@@ -13,6 +13,7 @@ type ActionableEntity interface {
 // See http://stackoverflow.com/questions/28800672/how-to-add-new-methods-to-an-existing-type-in-go
 type ActionPod libs.Pod
 type ActionDeployment libs.Deployment
+type ActionDaemonSet libs.DaemonSet
 type ActionIngress libs.Ingress
 type ActionJob libs.Job
 type ActionCronJob libs.CronJob
@@ -43,6 +44,18 @@ func (a ActionDeployment) DoAction() {
 	replicas := int32(0)
 	kd.Spec.Replicas = &replicas
 	_, err = clientset.AppsV1beta1().Deployments(a.Namespace).Update(kd)
+	if err != nil {
+		libs.Log.Error(err)
+	}
+}
+
+func (a ActionDaemonSet) DoAction() {
+	clientset, err := k8s.LoadClientset()
+	if err != nil {
+		panic(err)
+	}
+	libs.Log.Debug("Deleting DaemonSet ", a.Name, " in namesapce ", a.Namespace)
+	err = clientset.ExtensionsV1beta1().DaemonSets(a.Namespace).Delete(a.Name, &metav1.DeleteOptions{})
 	if err != nil {
 		libs.Log.Error(err)
 	}

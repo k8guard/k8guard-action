@@ -47,6 +47,10 @@ type RequiredPodAnnotationAction struct {
 	violations.Violation
 }
 
+type RequiredDaemonSetAction struct {
+	violations.Violation
+}
+
 // action for containers with extra capablities.
 func (a CapabilitiesAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
 	lastTimeWarned, doIt := getLastTimeWarnedAndifToDoAction(lastActions)
@@ -186,12 +190,34 @@ func (a RequiredPodAnnotationAction) DoAction(entity ActionableEntity, vEntity l
 
 }
 
+// action for missing mandatory daemonset
+func (a RequiredDaemonSetAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
+
+	lastTimeWarned, doIt := getLastTimeWarnedAndifToDoAction(lastActions)
+	if doIt {
+		entity.DoAction()
+		return []string{"entity_action"}
+	}
+	if canSkipNotification(lastTimeWarned) {
+		libs.Log.Debug("Skipping notification for ", vEntity.Name, " ", a.Type, " it was notified less than ", libs.Cfg.DurationBetweenNotifyingAgain, " ago.")
+		return []string{}
+	}
+
+	actMessage := createActionMessage(vEntity.Namespace, reflect.TypeOf(entity).Name(), vEntity.Name, "Missing required daemonset", a.Violation.Source, len(lastActions["notify"]), isLastWarning(lastActions))
+	NotifyOfViolation(actMessage)
+	return []string{"notify"}
+
+}
+
 func ConvertActionableEntityToViolatableEntity(entity ActionableEntity) (libs.ViolatableEntity, error) {
 
 	var vEntity libs.ViolatableEntity
 
 	switch t := entity.(type) {
 	case ActionDeployment:
+		vEntity = t.ViolatableEntity
+		break
+	case ActionDaemonSet:
 		vEntity = t.ViolatableEntity
 		break
 	case ActionPod:

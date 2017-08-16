@@ -109,6 +109,16 @@ func parseViolationMessage(msg *sarama.ConsumerMessage) {
 		entityViolations = append(entityViolations, deployment.Violations...)
 
 		break
+	case string(kafka.DAEMONSET_MESSAGE):
+		libs.Log.Debug("Parsing DaemonSet Message")
+
+		daemonSet := actions.ActionDaemonSet{}
+		json.Unmarshal(dataBytes, &daemonSet)
+		actionableEntity = daemonSet
+
+		entityViolations = append(entityViolations, daemonSet.Violations...)
+
+		break
 	case string(kafka.INGRESS_MESSAGE):
 		libs.Log.Debug("Parsing Ingress Message")
 
@@ -207,6 +217,9 @@ func createAction(violation violations.Violation) actions.Action {
 		break
 	case violations.REQUIRED_POD_ANNOTATIONS_TYPE:
 		action = actions.RequiredPodAnnotationAction{Violation: violation}
+		break
+	case violations.REQUIRED_DAEMONSETS_TYPE:
+		action = actions.RequiredDaemonSetAction{Violation: violation}
 		break
 	default:
 		libs.Log.Fatal("Unknown Violation Type ", vType)
