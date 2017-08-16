@@ -205,6 +205,9 @@ func createAction(violation violations.Violation) actions.Action {
 	case violations.HOST_VOLUMES_TYPE:
 		action = actions.HostVolumesAction{Violation: violation}
 		break
+	case violations.REQUIRED_POD_ANNOTATIONS_TYPE:
+		action = actions.RequiredPodAnnotationAction{Violation: violation}
+		break
 	default:
 		libs.Log.Fatal("Unknown Violation Type ", vType)
 	}

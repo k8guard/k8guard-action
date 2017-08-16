@@ -43,6 +43,10 @@ type IngressAction struct {
 	violations.Violation
 }
 
+type RequiredPodAnnotationAction struct {
+	violations.Violation
+}
+
 // action for containers with extra capablities.
 func (a CapabilitiesAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
 	lastTimeWarned, doIt := getLastTimeWarnedAndifToDoAction(lastActions)
@@ -161,6 +165,25 @@ func (a IngressAction) DoAction(entity ActionableEntity, vEntity libs.Violatable
 	}
 
 	return []string{"notify", "entity_action"}
+}
+
+// action for missing pod annotation
+func (a RequiredPodAnnotationAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
+
+	lastTimeWarned, doIt := getLastTimeWarnedAndifToDoAction(lastActions)
+	if doIt {
+		entity.DoAction()
+		return []string{"entity_action"}
+	}
+	if canSkipNotification(lastTimeWarned) {
+		libs.Log.Debug("Skipping notification for ", vEntity.Name, " ", a.Type, " it was notified less than ", libs.Cfg.DurationBetweenNotifyingAgain, " ago.")
+		return []string{}
+	}
+
+	actMessage := createActionMessage(vEntity.Namespace, reflect.TypeOf(entity).Name(), vEntity.Name, "Missing pod annotation", a.Violation.Source, len(lastActions["notify"]), isLastWarning(lastActions))
+	NotifyOfViolation(actMessage)
+	return []string{"notify"}
+
 }
 
 func ConvertActionableEntityToViolatableEntity(entity ActionableEntity) (libs.ViolatableEntity, error) {
