@@ -43,7 +43,39 @@ type IngressAction struct {
 	violations.Violation
 }
 
+type RequiredPodAction struct {
+	violations.Violation
+}
+
 type RequiredPodAnnotationAction struct {
+	violations.Violation
+}
+
+type RequiredPodLabelAction struct {
+	violations.Violation
+}
+
+type RequiredNamespaceAction struct {
+	violations.Violation
+}
+
+type RequiredNamespaceAnnotationAction struct {
+	violations.Violation
+}
+
+type RequiredNamespaceLabelAction struct {
+	violations.Violation
+}
+
+type RequiredDeploymentAction struct {
+	violations.Violation
+}
+
+type RequiredDeploymentAnnotationAction struct {
+	violations.Violation
+}
+
+type RequiredDeploymentLabelAction struct {
 	violations.Violation
 }
 
@@ -51,109 +83,42 @@ type RequiredDaemonSetAction struct {
 	violations.Violation
 }
 
+type RequiredDaemonSetAnnotationAction struct {
+	violations.Violation
+}
+
+type RequiredDaemonSetLabelAction struct {
+	violations.Violation
+}
+
 // action for containers with extra capablities.
 func (a CapabilitiesAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
-	lastTimeWarned, doIt := getLastTimeWarnedAndifToDoAction(lastActions)
-	if doIt {
-		entity.DoAction()
-		return []string{"entity_action"}
-	}
-
-	if canSkipNotification(lastTimeWarned) {
-		libs.Log.Debug("Skipping notification for ", vEntity.Name, " ", a.Type, " it was notified less than ", libs.Cfg.DurationBetweenNotifyingAgain, " ago.")
-		return []string{}
-	}
-
-	aMessage := createActionMessage(vEntity.Namespace, reflect.TypeOf(entity).Name(), vEntity.Name, "Extra Capabilities", a.Violation.Source, len(lastActions["notify"]), isLastWarning(lastActions))
-	NotifyOfViolation(aMessage)
-	return []string{"notify"}
-
+	return processAction(entity, vEntity, lastActions, "Extra Capabilities", a.Violation.Source, a.Type)
 }
 
 // Action for privileged mode containers
 func (a PrivilegedAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
-	lastTimeWarned, doIt := getLastTimeWarnedAndifToDoAction(lastActions)
-	if doIt {
-		entity.DoAction()
-		return []string{"entity_action"}
-	}
-	if canSkipNotification(lastTimeWarned) {
-		libs.Log.Info("Skipping notification for ", vEntity.Name, " ", a.Type, " it was notified less than ", libs.Cfg.DurationBetweenNotifyingAgain, " ago.")
-		return []string{}
-	}
-	actMessage := createActionMessage(vEntity.Namespace, reflect.TypeOf(entity).Name(), vEntity.Name, "Privileged Mode", a.Violation.Source, len(lastActions["notify"]), isLastWarning(lastActions))
-	NotifyOfViolation(actMessage)
-
-	return []string{"notify"}
-
+	return processAction(entity, vEntity, lastActions, "Privileged Mode", a.Violation.Source, a.Type)
 }
 
 // Action for any pod with a hostVolume
 func (a HostVolumesAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
-	lastTimeWarned, doIt := getLastTimeWarnedAndifToDoAction(lastActions)
-	if doIt {
-		entity.DoAction()
-		return []string{"entity_action"}
-	}
-	if canSkipNotification(lastTimeWarned) {
-		libs.Log.Debug("Skipping notification for ", vEntity.Name, " ", a.Type, " it was notified less than ", libs.Cfg.DurationBetweenNotifyingAgain, " ago.")
-		return []string{}
-	}
-
-	actMessage := createActionMessage(vEntity.Namespace, reflect.TypeOf(entity).Name(), vEntity.Name, "Host Volumes Mounted", a.Violation.Source, len(lastActions["notify"]), isLastWarning(lastActions))
-	NotifyOfViolation(actMessage)
-
-	return []string{"notify"}
-
+	return processAction(entity, vEntity, lastActions, "Host Volumes Mounted", a.Violation.Source, a.Type)
 }
 
 // action for pods with single replica , currently action is supressed.
 func (a SingleReplicaAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
-
-	lastTimeWarned, _ := getLastTimeWarnedAndifToDoAction(lastActions)
-
-	if canSkipNotification(lastTimeWarned) {
-		libs.Log.Debug("Skipping notification for ", vEntity.Name, " ", a.Type, " it was notified less than ", libs.Cfg.DurationBetweenNotifyingAgain, " ago.")
-		return []string{}
-	}
-
-	aMessage := createActionMessage(vEntity.Namespace, reflect.TypeOf(entity).Name(), vEntity.Name, "Single Replica", a.Source, len(lastActions), false)
-
-	NotifyOfViolation(aMessage)
-
-	return []string{"notify"}
+	return processSupressedAction(entity, vEntity, lastActions, "Single Replica", a.Source, a.Type)
 }
 
 // action for a container with a big image size
 func (a ImageSizeAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
-	lastTimeWarned, _ := getLastTimeWarnedAndifToDoAction(lastActions)
-	if canSkipNotification(lastTimeWarned) {
-		libs.Log.Debug("Skipping notification for ", vEntity.Name, " ", a.Type, " it was notified less than ", libs.Cfg.DurationBetweenNotifyingAgain, " ago.")
-		return []string{}
-	}
-	actMessage := createActionMessage(vEntity.Namespace, reflect.TypeOf(entity).Name(), vEntity.Name, "Invalid Image Size", a.Source, len(lastActions), false)
-	NotifyOfViolation(actMessage)
-
-	return []string{"notify"}
+	return processSupressedAction(entity, vEntity, lastActions, "Invalid Image Size", a.Source, a.Type)
 }
 
 // action for invalid repo for an image
 func (a ImageRepoAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
-
-	lastTimeWarned, doIt := getLastTimeWarnedAndifToDoAction(lastActions)
-	if doIt {
-		entity.DoAction()
-		return []string{"entity_action"}
-	}
-	if canSkipNotification(lastTimeWarned) {
-		libs.Log.Debug("Skipping notification for ", vEntity.Name, " ", a.Type, " it was notified less than ", libs.Cfg.DurationBetweenNotifyingAgain, " ago.")
-		return []string{}
-	}
-
-	actMessage := createActionMessage(vEntity.Namespace, reflect.TypeOf(entity).Name(), vEntity.Name, "Invalid Image Repo", a.Violation.Source, len(lastActions["notify"]), isLastWarning(lastActions))
-	NotifyOfViolation(actMessage)
-	return []string{"notify"}
-
+	return processAction(entity, vEntity, lastActions, "Invalid Image Repo", a.Violation.Source, a.Type)
 }
 
 // action for ingress, a special kind that we don't warn.
@@ -171,42 +136,64 @@ func (a IngressAction) DoAction(entity ActionableEntity, vEntity libs.Violatable
 	return []string{"notify", "entity_action"}
 }
 
+// action for missing mandatory namespace
+func (a RequiredNamespaceAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
+	return processAction(entity, vEntity, lastActions, "Missing required namespace", a.Violation.Source, a.Type)
+}
+
+// action for missing namespace annotation
+func (a RequiredNamespaceAnnotationAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
+	return processAction(entity, vEntity, lastActions, "Missing namespace annotation", a.Violation.Source, a.Type)
+}
+
+// action for missing namespace label
+func (a RequiredNamespaceLabelAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
+	return processAction(entity, vEntity, lastActions, "Missing namespace label", a.Violation.Source, a.Type)
+}
+
+// action for missing mandatory deployment
+func (a RequiredDeploymentAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
+	return processAction(entity, vEntity, lastActions, "Missing required deployment", a.Violation.Source, a.Type)
+}
+
+// action for missing namespace annotation
+func (a RequiredDeploymentAnnotationAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
+	return processAction(entity, vEntity, lastActions, "Missing deployment annotation", a.Violation.Source, a.Type)
+}
+
+// action for missing namespace label
+func (a RequiredDeploymentLabelAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
+	return processAction(entity, vEntity, lastActions, "Missing deployment label", a.Violation.Source, a.Type)
+}
+
+// action for missing mandatory pod
+func (a RequiredPodAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
+	return processAction(entity, vEntity, lastActions, "Missing required pod", a.Violation.Source, a.Type)
+}
+
 // action for missing pod annotation
 func (a RequiredPodAnnotationAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
+	return processAction(entity, vEntity, lastActions, "Missing pod annotation", a.Violation.Source, a.Type)
+}
 
-	lastTimeWarned, doIt := getLastTimeWarnedAndifToDoAction(lastActions)
-	if doIt {
-		entity.DoAction()
-		return []string{"entity_action"}
-	}
-	if canSkipNotification(lastTimeWarned) {
-		libs.Log.Debug("Skipping notification for ", vEntity.Name, " ", a.Type, " it was notified less than ", libs.Cfg.DurationBetweenNotifyingAgain, " ago.")
-		return []string{}
-	}
-
-	actMessage := createActionMessage(vEntity.Namespace, reflect.TypeOf(entity).Name(), vEntity.Name, "Missing pod annotation", a.Violation.Source, len(lastActions["notify"]), isLastWarning(lastActions))
-	NotifyOfViolation(actMessage)
-	return []string{"notify"}
-
+// action for missing pod label
+func (a RequiredPodLabelAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
+	return processAction(entity, vEntity, lastActions, "Missing pod label", a.Violation.Source, a.Type)
 }
 
 // action for missing mandatory daemonset
 func (a RequiredDaemonSetAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
+	return processAction(entity, vEntity, lastActions, "Missing required daemonset", a.Violation.Source, a.Type)
+}
 
-	lastTimeWarned, doIt := getLastTimeWarnedAndifToDoAction(lastActions)
-	if doIt {
-		entity.DoAction()
-		return []string{"entity_action"}
-	}
-	if canSkipNotification(lastTimeWarned) {
-		libs.Log.Debug("Skipping notification for ", vEntity.Name, " ", a.Type, " it was notified less than ", libs.Cfg.DurationBetweenNotifyingAgain, " ago.")
-		return []string{}
-	}
+// action for missing daemonset annotation
+func (a RequiredDaemonSetAnnotationAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
+	return processAction(entity, vEntity, lastActions, "Missing daemonset annotation", a.Violation.Source, a.Type)
+}
 
-	actMessage := createActionMessage(vEntity.Namespace, reflect.TypeOf(entity).Name(), vEntity.Name, "Missing required daemonset", a.Violation.Source, len(lastActions["notify"]), isLastWarning(lastActions))
-	NotifyOfViolation(actMessage)
-	return []string{"notify"}
-
+// action for missing daemonset label
+func (a RequiredDaemonSetLabelAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
+	return processAction(entity, vEntity, lastActions, "Missing daemonset label", a.Violation.Source, a.Type)
 }
 
 func ConvertActionableEntityToViolatableEntity(entity ActionableEntity) (libs.ViolatableEntity, error) {
@@ -237,6 +224,38 @@ func ConvertActionableEntityToViolatableEntity(entity ActionableEntity) (libs.Vi
 	}
 
 	return vEntity, nil
+}
+
+func processAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time, violationMessage string, violationSource string, violationType violations.ViolationType) []string {
+	lastTimeWarned, doIt := getLastTimeWarnedAndifToDoAction(lastActions)
+	if doIt {
+		entity.DoAction()
+		return []string{"entity_action"}
+	}
+
+	if canSkipNotification(lastTimeWarned) {
+		libs.Log.Debug("Skipping notification for ", vEntity.Name, " ", violationType, " it was notified less than ", libs.Cfg.DurationBetweenNotifyingAgain, " ago.")
+		return []string{}
+	}
+
+	aMessage := createActionMessage(vEntity.Namespace, reflect.TypeOf(entity).Name(), vEntity.Name, violationMessage, violationSource, len(lastActions["notify"]), isLastWarning(lastActions))
+	NotifyOfViolation(aMessage)
+	return []string{"notify"}
+
+}
+
+func processSupressedAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time, violationMessage string, violationSource string, violationType violations.ViolationType) []string {
+	lastTimeWarned, _ := getLastTimeWarnedAndifToDoAction(lastActions)
+
+	if canSkipNotification(lastTimeWarned) {
+		libs.Log.Debug("Skipping notification for ", vEntity.Name, " ", violationType, " it was notified less than ", libs.Cfg.DurationBetweenNotifyingAgain, " ago.")
+		return []string{}
+	}
+
+	aMessage := createActionMessage(vEntity.Namespace, reflect.TypeOf(entity).Name(), vEntity.Name, violationMessage, violationSource, len(lastActions["notify"]), isLastWarning(lastActions))
+	NotifyOfViolation(aMessage)
+	return []string{"notify"}
+
 }
 
 func createActionMessage(namespace string, entityType string, sourceName string, violationType string, violationSource string, warningCount int, lastWarning bool) actionMessage {
