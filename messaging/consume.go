@@ -109,6 +109,16 @@ func parseViolationMessage(msg *sarama.ConsumerMessage) {
 		entityViolations = append(entityViolations, deployment.Violations...)
 
 		break
+	case string(kafka.DAEMONSET_MESSAGE):
+		libs.Log.Debug("Parsing DaemonSet Message")
+
+		daemonSet := actions.ActionDaemonSet{}
+		json.Unmarshal(dataBytes, &daemonSet)
+		actionableEntity = daemonSet
+
+		entityViolations = append(entityViolations, daemonSet.Violations...)
+
+		break
 	case string(kafka.INGRESS_MESSAGE):
 		libs.Log.Debug("Parsing Ingress Message")
 
@@ -181,33 +191,48 @@ func parseViolationMessage(msg *sarama.ConsumerMessage) {
 }
 
 func createAction(violation violations.Violation) actions.Action {
-	var action actions.Action
-
 	switch vType := violation.Type; vType {
 	case violations.SINGLE_REPLICA_TYPE:
-		action = actions.SingleReplicaAction{Violation: violation}
-		break
+		return actions.SingleReplicaAction{Violation: violation}
 	case violations.IMAGE_SIZE_TYPE:
-		action = actions.ImageSizeAction{Violation: violation}
-		break
+		return actions.ImageSizeAction{Violation: violation}
 	case violations.IMAGE_REPO_TYPE:
-		action = actions.ImageRepoAction{Violation: violation}
-		break
+		return actions.ImageRepoAction{Violation: violation}
 	case violations.INGRESS_HOST_INVALID_TYPE:
-		action = actions.IngressAction{Violation: violation}
-		break
+		return actions.IngressAction{Violation: violation}
 	case violations.CAPABILITIES_TYPE:
-		action = actions.CapabilitiesAction{Violation: violation}
-		break
+		return actions.CapabilitiesAction{Violation: violation}
 	case violations.PRIVILEGED_TYPE:
-		action = actions.PrivilegedAction{Violation: violation}
-		break
+		return actions.PrivilegedAction{Violation: violation}
 	case violations.HOST_VOLUMES_TYPE:
-		action = actions.HostVolumesAction{Violation: violation}
-		break
+		return actions.HostVolumesAction{Violation: violation}
+	case violations.REQUIRED_NAMESPACES_TYPE:
+		return actions.RequiredNamespaceAction{Violation: violation}
+	case violations.REQUIRED_NAMESPACE_ANNOTATIONS_TYPE:
+		return actions.RequiredNamespaceAnnotationAction{Violation: violation}
+	case violations.REQUIRED_NAMESPACE_LABELS_TYPE:
+		return actions.RequiredNamespaceLabelAction{Violation: violation}
+	case violations.REQUIRED_DEPLOYMENTS_TYPE:
+		return actions.RequiredDeploymentAction{Violation: violation}
+	case violations.REQUIRED_DEPLOYMENT_ANNOTATIONS_TYPE:
+		return actions.RequiredDeploymentAnnotationAction{Violation: violation}
+	case violations.REQUIRED_DEPLOYMENT_LABELS_TYPE:
+		return actions.RequiredDeploymentLabelAction{Violation: violation}
+	case violations.REQUIRED_PODS_TYPE:
+		return actions.RequiredPodAction{Violation: violation}
+	case violations.REQUIRED_POD_ANNOTATIONS_TYPE:
+		return actions.RequiredPodAnnotationAction{Violation: violation}
+	case violations.REQUIRED_POD_LABELS_TYPE:
+		return actions.RequiredPodLabelAction{Violation: violation}
+	case violations.REQUIRED_DAEMONSETS_TYPE:
+		return actions.RequiredDaemonSetAction{Violation: violation}
+	case violations.REQUIRED_DAEMONSET_ANNOTATIONS_TYPE:
+		return actions.RequiredDaemonSetAnnotationAction{Violation: violation}
+	case violations.REQUIRED_DAEMONSET_LABELS_TYPE:
+		return actions.RequiredDaemonSetLabelAction{Violation: violation}
 	default:
 		libs.Log.Fatal("Unknown Violation Type ", vType)
 	}
 
-	return action
+	return nil
 }
