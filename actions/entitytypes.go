@@ -73,6 +73,11 @@ func (a ActionJob) DoAction() {
 }
 
 func (a ActionCronJob) DoAction() {
+	if libs.Cfg.IncludeAlpha == false {
+		libs.Log.Debug("Ignoring CronJob action as alpha features are not enabled ")
+		return
+	}
+
 	clientset, err := k8s.LoadClientset()
 	if err != nil {
 		panic(err)
