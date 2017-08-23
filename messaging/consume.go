@@ -99,6 +99,16 @@ func parseViolationMessage(msg *sarama.ConsumerMessage) {
 		entityViolations = append(entityViolations, pod.Violations...)
 
 		break
+	case string(kafka.NAMESPACE_MESSAGE):
+		libs.Log.Debug("Parsing Namespace Message")
+
+		namespace := actions.ActionNamespace{}
+		json.Unmarshal(dataBytes, &namespace)
+		actionableEntity = namespace
+
+		entityViolations = append(entityViolations, namespace.Violations...)
+
+		break
 	case string(kafka.DEPLOYMENT_MESSAGE):
 		libs.Log.Debug("Parsing Deployment Message")
 
@@ -230,6 +240,10 @@ func createAction(violation violations.Violation) actions.Action {
 		return actions.RequiredDaemonSetAnnotationAction{Violation: violation}
 	case violations.REQUIRED_DAEMONSET_LABELS_TYPE:
 		return actions.RequiredDaemonSetLabelAction{Violation: violation}
+	case violations.REQUIRED_RESOURCEQUOTA_TYPE:
+		return actions.RequiredResourceQuotaAction{Violation: violation}
+	case violations.NO_OWNER_ANNOTATION_TYPE:
+		return actions.NoOwnerAction{Violation: violation}
 	default:
 		libs.Log.Fatal("Unknown Violation Type ", vType)
 	}
