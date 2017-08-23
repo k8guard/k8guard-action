@@ -91,6 +91,14 @@ type RequiredDaemonSetLabelAction struct {
 	violations.Violation
 }
 
+type RequiredResourceQuotaAction struct {
+	violations.Violation
+}
+
+type NoOwnerAction struct {
+	violations.Violation
+}
+
 // action for containers with extra capablities.
 func (a CapabilitiesAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
 	return processAction(entity, vEntity, lastActions, "Extra Capabilities", a.Violation.Source, a.Type)
@@ -196,12 +204,25 @@ func (a RequiredDaemonSetLabelAction) DoAction(entity ActionableEntity, vEntity 
 	return processAction(entity, vEntity, lastActions, "Missing daemonset label", a.Violation.Source, a.Type)
 }
 
+// action for missing mandatory resourcequota
+func (a RequiredResourceQuotaAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
+	return processAction(entity, vEntity, lastActions, "Missing required resourcequota", a.Violation.Source, a.Type)
+}
+
+// action for missing owner
+func (a NoOwnerAction) DoAction(entity ActionableEntity, vEntity libs.ViolatableEntity, lastActions map[string][]time.Time) []string {
+	return processAction(entity, vEntity, lastActions, "No owner", a.Violation.Source, a.Type)
+}
+
 func ConvertActionableEntityToViolatableEntity(entity ActionableEntity) (libs.ViolatableEntity, error) {
 
 	var vEntity libs.ViolatableEntity
 
 	switch t := entity.(type) {
 	case ActionDeployment:
+		vEntity = t.ViolatableEntity
+		break
+	case ActionNamespace:
 		vEntity = t.ViolatableEntity
 		break
 	case ActionDaemonSet:
