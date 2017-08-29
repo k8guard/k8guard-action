@@ -1,14 +1,9 @@
 package messaging
 
 import (
-	"fmt"
-	"os"
-	"os/signal"
-	"syscall"
-
-	"github.com/Shopify/sarama"
 	libs "github.com/k8guard/k8guardlibs"
-	"github.com/k8guard/k8guardlibs/messaging/kafka"
+	"github.com/k8guard/k8guardlibs/messaging"
+	"github.com/k8guard/k8guardlibs/messaging/types"
 
 	"encoding/json"
 	"reflect"
@@ -22,50 +17,18 @@ import (
 
 func ConsumeMessages() {
 
-	signalChannel := make(chan os.Signal, 2)
-	signal.Notify(signalChannel, syscall.SIGTERM)
-
-	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, os.Interrupt)
-
-	topic := libs.Cfg.KafkaActionTopic
-
-	master, err := kafka.NewConsumer(kafka.ACTION_CLIENTID, libs.Cfg)
+	c, err := messaging.CreateMessageConsumer(
+		types.MessageBrokerType(libs.Cfg.MessageBroker), types.ACTION_CLIENTID, libs.Cfg)
 	if err != nil {
 		panic(err)
-
 	}
 
 	defer func() {
-		if err := master.Close(); err != nil {
-			panic(err)
-		}
+		c.Close()
 	}()
 
-	partitions, _ := master.Partitions(topic)
-
-	messages := make(chan *sarama.ConsumerMessage)
-	for _, partition := range partitions {
-
-		libs.Log.Info("Creating Consumer ", topic, " on partition ", partition)
-		consumer, err := master.ConsumePartition(topic, partition, sarama.OffsetNewest)
-		if err != nil {
-			panic(err)
-		}
-
-		go func(consumer sarama.PartitionConsumer) {
-			for {
-				select {
-				case err := <-consumer.Errors():
-					fmt.Println(err)
-				case msg := <-consumer.Messages():
-					messages <- msg
-				case <-signals:
-					libs.Log.Debug("Interrupt is detected")
-				}
-			}
-		}(consumer)
-	}
+	messages := make(chan []byte)
+	c.ConsumeMessages(messages)
 
 	libs.Log.Info("Waiting for messages")
 	for {
@@ -74,11 +37,11 @@ func ConsumeMessages() {
 	}
 }
 
-func parseViolationMessage(msg *sarama.ConsumerMessage) {
-	libs.Log.Info("Taking Action ...")
+func parseViolationMessage(msg []byte) {
+	libs.Log.Info("Processing violation message ...")
 
 	messageData := map[string]interface{}{}
-	err := json.Unmarshal(msg.Value, &messageData)
+	err := json.Unmarshal(msg, &messageData)
 	if err != nil {
 		libs.Log.Fatal(err)
 	}
@@ -89,7 +52,7 @@ func parseViolationMessage(msg *sarama.ConsumerMessage) {
 	var actionableEntity actions.ActionableEntity
 
 	switch messageData["kind"] {
-	case string(kafka.POD_MESSAGE):
+	case string(types.POD_MESSAGE):
 		libs.Log.Debug("Parsing Pod Message")
 
 		pod := actions.ActionPod{}
@@ -99,7 +62,7 @@ func parseViolationMessage(msg *sarama.ConsumerMessage) {
 		entityViolations = append(entityViolations, pod.Violations...)
 
 		break
-	case string(kafka.NAMESPACE_MESSAGE):
+	case string(types.NAMESPACE_MESSAGE):
 		libs.Log.Debug("Parsing Namespace Message")
 
 		namespace := actions.ActionNamespace{}
@@ -109,7 +72,7 @@ func parseViolationMessage(msg *sarama.ConsumerMessage) {
 		entityViolations = append(entityViolations, namespace.Violations...)
 
 		break
-	case string(kafka.DEPLOYMENT_MESSAGE):
+	case string(types.DEPLOYMENT_MESSAGE):
 		libs.Log.Debug("Parsing Deployment Message")
 
 		deployment := actions.ActionDeployment{}
@@ -119,7 +82,7 @@ func parseViolationMessage(msg *sarama.ConsumerMessage) {
 		entityViolations = append(entityViolations, deployment.Violations...)
 
 		break
-	case string(kafka.DAEMONSET_MESSAGE):
+	case string(types.DAEMONSET_MESSAGE):
 		libs.Log.Debug("Parsing DaemonSet Message")
 
 		daemonSet := actions.ActionDaemonSet{}
@@ -129,7 +92,7 @@ func parseViolationMessage(msg *sarama.ConsumerMessage) {
 		entityViolations = append(entityViolations, daemonSet.Violations...)
 
 		break
-	case string(kafka.INGRESS_MESSAGE):
+	case string(types.INGRESS_MESSAGE):
 		libs.Log.Debug("Parsing Ingress Message")
 
 		ingress := actions.ActionIngress{}
@@ -139,7 +102,7 @@ func parseViolationMessage(msg *sarama.ConsumerMessage) {
 		entityViolations = append(entityViolations, ingress.Violations...)
 
 		break
-	case string(kafka.JOB_MESSAGE):
+	case string(types.JOB_MESSAGE):
 		libs.Log.Debug("Parsing Job Message")
 
 		job := actions.ActionJob{}
@@ -149,7 +112,7 @@ func parseViolationMessage(msg *sarama.ConsumerMessage) {
 		entityViolations = append(entityViolations, job.Violations...)
 
 		break
-	case string(kafka.CRONJOB_MESSAGE):
+	case string(types.CRONJOB_MESSAGE):
 		libs.Log.Debug("Parsing CronJob Message")
 
 		cronjob := actions.ActionCronJob{}
