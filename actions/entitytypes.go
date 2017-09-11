@@ -12,7 +12,9 @@ type ActionableEntity interface {
 
 // See http://stackoverflow.com/questions/28800672/how-to-add-new-methods-to-an-existing-type-in-go
 type ActionPod libs.Pod
+type ActionNamespace libs.Namespace
 type ActionDeployment libs.Deployment
+type ActionDaemonSet libs.DaemonSet
 type ActionIngress libs.Ingress
 type ActionJob libs.Job
 type ActionCronJob libs.CronJob
@@ -22,7 +24,7 @@ func (a ActionPod) DoAction() {
 	if err != nil {
 		panic(err)
 	}
-	libs.Log.Debug("Deleting Pod ", a.Name, " in namesapce ", a.Namespace)
+	libs.Log.Debug("Deleting Pod ", a.Name, " in namespace ", a.Namespace)
 	err = clientset.CoreV1().Pods(a.Namespace).Delete(a.Name, &metav1.DeleteOptions{})
 	if err != nil {
 		libs.Log.Error(err)
@@ -34,7 +36,7 @@ func (a ActionDeployment) DoAction() {
 	if err != nil {
 		panic(err)
 	}
-	libs.Log.Debug("Scaling Deployment ", a.Name, " in namesapce ", a.Namespace)
+	libs.Log.Debug("Scaling Deployment ", a.Name, " in namespace ", a.Namespace)
 	kd, err := clientset.AppsV1beta1().Deployments(a.Namespace).Get(a.Name, metav1.GetOptions{})
 	if err != nil {
 		libs.Log.Error(err)
@@ -48,12 +50,36 @@ func (a ActionDeployment) DoAction() {
 	}
 }
 
+func (a ActionNamespace) DoAction() {
+	clientset, err := k8s.LoadClientset()
+	if err != nil {
+		panic(err)
+	}
+	libs.Log.Debug("Deleting Namespace ", a.Name)
+	err = clientset.Namespaces().Delete(a.Name, &metav1.DeleteOptions{})
+	if err != nil {
+		libs.Log.Error(err)
+	}
+}
+
+func (a ActionDaemonSet) DoAction() {
+	clientset, err := k8s.LoadClientset()
+	if err != nil {
+		panic(err)
+	}
+	libs.Log.Debug("Deleting DaemonSet ", a.Name, " in namespace ", a.Namespace)
+	err = clientset.ExtensionsV1beta1().DaemonSets(a.Namespace).Delete(a.Name, &metav1.DeleteOptions{})
+	if err != nil {
+		libs.Log.Error(err)
+	}
+}
+
 func (a ActionIngress) DoAction() {
 	clientset, err := k8s.LoadClientset()
 	if err != nil {
 		panic(err)
 	}
-	libs.Log.Debug("Deleting Ingress ", a.Name, " in namesapce ", a.Namespace)
+	libs.Log.Debug("Deleting Ingress ", a.Name, " in namespace ", a.Namespace)
 	err = clientset.Ingresses(a.Namespace).Delete(a.Name, &metav1.DeleteOptions{})
 	if err != nil {
 		libs.Log.Error(err)
@@ -65,7 +91,7 @@ func (a ActionJob) DoAction() {
 	if err != nil {
 		panic(err)
 	}
-	libs.Log.Debug("Deleting Job ", a.Name, " in namesapce ", a.Namespace)
+	libs.Log.Debug("Deleting Job ", a.Name, " in namespace ", a.Namespace)
 	err = clientset.BatchV1().Jobs(a.Namespace).Delete(a.Name, &metav1.DeleteOptions{})
 	if err != nil {
 		libs.Log.Error(err)
@@ -82,7 +108,7 @@ func (a ActionCronJob) DoAction() {
 	if err != nil {
 		panic(err)
 	}
-	libs.Log.Debug("Disabling CronJob ", a.Name, " in namesapce ", a.Namespace)
+	libs.Log.Debug("Disabling CronJob ", a.Name, " in namespace ", a.Namespace)
 
 	kcj, err := clientset.BatchV2alpha1().CronJobs(a.Namespace).Get(a.Name, metav1.GetOptions{})
 	if err != nil {
