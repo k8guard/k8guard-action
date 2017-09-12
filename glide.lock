@@ -1,5 +1,5 @@
-hash: f7e48642e8abdf506001dc59d86af8ef1d2440895191d70effcbbfdbdf0ae4fc
-updated: 2017-09-12T09:51:02.399179056-05:00
+hash: f080dfb5c2c8304af5dac6d442ec4be8ef5b336126461ba5fe3482ef66c655db
+updated: 2017-09-12T18:00:57.699510953-05:00
 imports:
 - name: github.com/adjust/rmq
   version: 99798ba09475383696d53071bd9885ac41694a7b
@@ -71,7 +71,7 @@ imports:
 - name: github.com/juju/ratelimit
   version: 77ed1c8a01217656d2080ad51981f6e99adaa177
 - name: github.com/k8guard/k8guardlibs
-  version: ec959f13f421a6ba3fd8e68ea4e85c71a181cc4e
+  version: 8cec16bc4ab2dd3555caa42239d7bf985a7641d5
   repo: https://github.com/k8guard/k8guardlibs.git
   vcs: git
   subpackages:
