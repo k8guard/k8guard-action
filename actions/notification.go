@@ -78,7 +78,9 @@ func NotifyOfViolation(actionMessage actionMessage) {
 		panic(err)
 	}
 
-	go notifyHipChat(tpl.String(), ns, actionMessage.LastWarning)
+	if libs.Cfg.UseHipChat {
+		go notifyHipChat(tpl.String(), ns, actionMessage.LastWarning)
+	}
 	notifyEmail(tpl.String(), ns, actionMessage.LastWarning)
 
 }
