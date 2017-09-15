@@ -1,5 +1,5 @@
-hash: f080dfb5c2c8304af5dac6d442ec4be8ef5b336126461ba5fe3482ef66c655db
-updated: 2017-09-12T18:00:57.699510953-05:00
+hash: fd8cdc9f85438e272c8a3ec6a628b32790a74470a39e41f03ff17f4a2115bc04
+updated: 2017-09-18T15:40:41.92812163-07:00
 imports:
 - name: github.com/adjust/rmq
   version: 99798ba09475383696d53071bd9885ac41694a7b
@@ -90,8 +90,10 @@ imports:
   - buffer
   - jlexer
   - jwriter
+- name: github.com/nlopes/slack
+  version: 5cde21b8b96a43fc3435a1f514123d14fd7eabdc
 - name: github.com/pierrec/lz4
-  version: 5a3d2245f97fc249850e7802e3c01fad02a1c316
+  version: 08c27939df1bd95e881e2c2367a749964ad1fceb
 - name: github.com/pierrec/xxHash
   version: a0006b13c722f7f12368c00a3d3c2ae8a999a0c6
   subpackages:
@@ -128,6 +130,7 @@ imports:
   - http2/hpack
   - idna
   - lex/httplex
+  - websocket
 - name: golang.org/x/sys
   version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
   subpackages:

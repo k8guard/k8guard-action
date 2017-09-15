@@ -17,5 +17,6 @@ import:
   version: 8cec16bc4ab2dd3555caa42239d7bf985a7641d5
   vcs: git
 
+- package: github.com/nlopes/slack
 
 - package: gopkg.in/gomail.v2

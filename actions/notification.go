@@ -12,6 +12,7 @@ import (
 
 	libs "github.com/k8guard/k8guardlibs"
 	"github.com/k8guard/k8guardlibs/k8s"
+	"github.com/nlopes/slack"
 	"github.com/tbruyelle/hipchat-go/hipchat"
 	"gopkg.in/gomail.v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -20,6 +21,9 @@ import (
 
 var lastHipchat = time.Time{}
 var lastHipchatMutex = &sync.Mutex{}
+
+var lastSlack = time.Time{}
+var lastSlackMutex = &sync.Mutex{}
 
 const messageTemplate = `
 
@@ -79,6 +83,7 @@ func NotifyOfViolation(actionMessage actionMessage) {
 	}
 
 	go notifyHipChat(tpl.String(), ns, actionMessage.LastWarning)
+	go notifySlack(tpl.String(), ns, actionMessage.LastWarning)
 	notifyEmail(tpl.String(), ns, actionMessage.LastWarning)
 
 }
@@ -139,6 +144,20 @@ func notifyHipChat(message string, namespace *v1.Namespace, lastWarning bool) {
 		libs.Log.Error(err)
 	}
 
+}
+
+func notifySlack(message string, namespace *v1.Namespace, lastWarning bool) {
+	canChat := time.Now().Sub(lastSlack) < libs.Cfg.DurationBetweenChatNotifications
+	if canChat {
+		time.Sleep(libs.Cfg.DurationBetweenChatNotifications)
+	}
+	lastSlack = time.Now()
+	lastSlackMutex.Unlock()
+	api := slack.New(libs.Cfg.SlackToken)
+	_, _, err := api.PostMessage(libs.Cfg.SlackChannel, message, slack.PostMessageParameters{})
+	if err != nil {
+		libs.Log.Error(err)
+	}
 }
 
 func notifyEmail(actionMessage string, namespace *v1.Namespace, lastWarning bool) {
