@@ -14,8 +14,9 @@ import:
 
 - package: github.com/k8guard/k8guardlibs
   repo: https://github.com/k8guard/k8guardlibs.git
-  version: 8cec16bc4ab2dd3555caa42239d7bf985a7641d5
+  version: 7f5c929fff140db1da48751db28bf1e8f87bf161
   vcs: git
 
+- package: github.com/nlopes/slack
 
 - package: gopkg.in/gomail.v2
